@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        let lastTimestamp = "";
+        function fetchAttendance() {
+            fetch("{{ url_for('get_attendance') }}")
+            .then(response => response.json())
+            .then(data => {
+                let tableBody = document.getElementById("attendance-table-body");
+    
+                if (data.length > 0) {
+                    let latestTimestamp = data[0].timestamp;
+                    if (latestTimestamp !== lastTimestamp) {
+                        tableBody.innerHTML = "";
+                        data.forEach(record => {
+                            let row = `<tr>
+                                <td>${record.name}</td>
+                                <td>${record.timestamp}</td>
+                            </tr>`;
+                            tableBody.innerHTML += row;
+                        });
+    
+                        lastTimestamp = latestTimestamp;
+                    }
+                }
+            })
+            .catch(error => console.error("Error fetching attendance:", error));
+        }
+        setInterval(fetchAttendance, 3000);
+    </script>
+</head>
+<body>
+    <h1>Live Facial Recognition Attendance</h1>
+    <img src="{{ url_for('video_feed') }}" width="35%">
+    <br>
+    <a href="{{ url_for('new_face') }}">Add New Face</a>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Timestamp</th>
+        </tr>
+        <tbody id="attendance-table-body">
+            {% for record in records %}
+            <tr>
+                <td>{{ record[1] }}</td>
+                <td>{{ record[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('attendance') }}">Attendance Records</a>
+</body>
+</html>

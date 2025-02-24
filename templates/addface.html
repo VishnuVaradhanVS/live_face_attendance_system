@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Face</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Add a New Face</h1>
+    <br>
+    <img src="{{ url_for('video_feed') }}" width="35%">
+    <br>
+
+    <form id="add-face-form">
+        <div class="form-group">
+            <input type="text" id="name" placeholder="Enter Name" required>
+            <button type="submit">Add Face</button>
+        </div>    
+    </form>
+
+    <a href="{{ url_for('index') }}">Back to Live Feed</a>
+
+    <script>
+        document.getElementById("add-face-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let formData = new FormData();
+            let nameInput = document.getElementById("name").value;
+
+            if (!nameInput.trim()) {
+                alert("Please enter a name.");
+                return;
+            }
+
+            formData.append("name", nameInput);
+
+            fetch("/add_face", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById("name").value = "";
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
